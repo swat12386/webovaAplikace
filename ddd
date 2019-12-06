@@ -3,11 +3,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
 import java.util.Arrays;
-import java.util.Collections;
 
 public class KasaProcessor {
 
-    public void loadDiscountedItems() {
+    private KasaItem[] kasaItems;
+
+
+    public void loadItems() {
         ClassLoader classLoader = this.getClass().getClassLoader();
         File file = new File(classLoader.getResource("kasa-items.json").getFile());
 
@@ -15,114 +17,139 @@ public class KasaProcessor {
         try (Reader reader = new FileReader(file)) {
             KasaItem[] items = objectMapper.readValue(reader, KasaItem[].class);
 
-            int vysledek = 0;
-            for(KasaItem m : items){
-                if(m.isDiscounted() == true){
-                    System.out.println(m.getItemName());
-                    vysledek = m.getCurrentPrice() + vysledek;
-                }
-            }
-            System.out.println(vysledek);
+            int pocet = 0;
 
+            for (KasaItem m : items) {
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+                int x = m.getCategory().length;
 
-    public void loadFromLowest() {
-        ClassLoader classLoader = this.getClass().getClassLoader();
-        File file = new File(classLoader.getResource("kasa-items.json").getFile());
+                for (int i = 0; i < x; i++) {
 
-        ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        try (Reader reader = new FileReader(file)) {
-            KasaItem[] items = objectMapper.readValue(reader, KasaItem[].class);
-
-
-
-int velikostPole = 0 ;
-
-            for (KasaItem m : items)
-            {
-                if (m.isDiscounted()== true){
-
-                    velikostPole++;
-
-                }
-
-
-            }
-            System.out.println(velikostPole);
-
-            int[] serazeny = new int[items.length];
-            int[] serazeny1 = new int[items.length];
-            for(int i = 0 ; i<serazeny.length;i++){
-
-                if (items[i].isDiscounted() == true){
-                    serazeny1[i] = items[i].getOriginalPrice();
-
-                }
-
-                serazeny[i] = items[i].getCurrentPrice();
-
-            }
-
-
-            Arrays.sort(serazeny1);
-
-
-            int targetIndex = 0;
-            for( int sourceIndex = 0;  sourceIndex < serazeny1.length;  sourceIndex++ )
-            {
-                if( serazeny1[sourceIndex] != 0 )
-                    serazeny1[targetIndex++] = serazeny1[sourceIndex];
-            }
-            int[] newArray = new int[targetIndex];
-            System.arraycopy( serazeny1, 0, newArray, 0, targetIndex );
-
-            for (int i = 0; i <newArray.length ; i++) {
-
-                System.out.println(newArray[i]);
-            }
-
-
-            Arrays.sort(serazeny);
-
-            for (int i = 0; i <serazeny1.length ; i++) {
-
-                System.out.println(serazeny[i]);
-            }
-
-            for (int i = 0; i <items.length ; i++) {
-                if (items[i].isDiscounted() == true){
-                    for (int j = 0; j <items.length ; j++) {
-                        
-                        if (items[i].getCurrentPrice() == serazeny[i]){
-                            
-                            
-                        }
+                    if (m.getCategory()[i].equals("Vestavné domácí spotřebiče" )) {
+                        pocet++;
                     }
                 }
-                
             }
-            
-            
-/*
-            for (int i = 0; i <items.length ; i++) {
-               if( serazeny[i] == items[i].getCurrentPrice() ){
+            System.out.println(pocet);
 
-                   System.out.println(items[i].getItemName()+ "      " + serazeny[i]);
-               }else if (serazeny1[i] == items[i].getOriginalPrice()){
-                   System.out.println(items[i].getItemName() + "   " + serazeny1[i]);
-               }
-            }
-*/
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
-}
+    public void vypisNejlevnejsi(){
+
+        ClassLoader classLoader = this.getClass().getClassLoader();
+        File file = new File(classLoader.getResource("kasa-items.json").getFile());
+
+        ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        try (Reader reader = new FileReader(file)) {
+            KasaItem[] items = objectMapper.readValue(reader, KasaItem[].class);
+
+
+
+
+      long[] pole = new long[items.length];
+int y = 0;
+       for (KasaItem m : items) {
+
+           pole[y] = m.getCurrentPrice();
+y ++;
+       }
+
+
+            Arrays.sort(pole);
+
+
+
+
+
+
+            System.out.println(pole[pole.length-1]);
+            int i = 0;
+            for (int h = 0; h <2; h++) {
+
+
+
+                for (KasaItem m : items) {
+                    if (m.getCurrentPrice() == pole[i]) {
+
+                        System.out.println(m.getItemName() + "       "+m.getCurrentPrice());
+                    }
+
+                }
+                i++;
+            }
+
+
+
+        } catch(FileNotFoundException e){
+            e.printStackTrace();
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public void loadCattegory(){
+
+        ClassLoader classLoader = this.getClass().getClassLoader();
+        File file = new File(classLoader.getResource("kasa-items.json").getFile());
+
+        ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        try (Reader reader = new FileReader(file)) {
+            KasaItem[] items = objectMapper.readValue(reader, KasaItem[].class);
+
+
+            for (KasaItem m : items) {
+
+                int x = m.getCategory().length;
+                System.out.println("");
+                for (int i = 0; i < x; i++) {
+
+                    System.out.print(m.getCategory()[i]);
+                }
+            }
+
+
+        } catch(FileNotFoundException e){
+            e.printStackTrace();
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+    public void loadDiscountedItems() {
+
+        ClassLoader classLoader = this.getClass().getClassLoader();
+        File file = new File(classLoader.getResource("kasa-items.json").getFile());
+
+        ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        try (Reader reader = new FileReader(file)) {
+            KasaItem[] items = objectMapper.readValue(reader, KasaItem[].class);
+
+
+            for (KasaItem m : items) {
+
+                if(m.isDiscounted() == true){
+
+                    System.out.println(m.getItemName());
+                }
+            }
+
+
+            } catch(FileNotFoundException e){
+                e.printStackTrace();
+            } catch(IOException e){
+                e.printStackTrace();
+            }
+        }
+
+    }
